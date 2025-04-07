@@ -42,9 +42,6 @@ func calculate(_ args: [String]) -> Int {
             if let intVal = Int(args[index]) {
                 res += intVal
             }
-            else {
-                print("Error calculating the average")
-            }
         }
         return res / (args.count - 1)
     }
@@ -54,7 +51,7 @@ func calculate(_ args: [String]) -> Int {
             return 0
         }
         if let intVal = Int(args[0]) {
-            if intVal == 0 || intVal == 1{
+            if intVal == 0 {
                 return 1
             }
             res = 1
@@ -62,9 +59,6 @@ func calculate(_ args: [String]) -> Int {
                 res *= num
             }
             return res
-        }
-        else {
-            print("Error calculating the factorial")
         }
     }
     // arithmetic
@@ -94,6 +88,75 @@ func calculate(_ args: [String]) -> Int {
 }
 
 func calculate(_ arg: String) -> Int {
+    var res = 0
+    // count
+    if arg.contains("count") {
+        if let index = arg.firstIndex(of: "c") {
+            let substr = arg[arg.startIndex..<index]
+            return (substr.count) / 2
+        }
+        return -1
+    }
+    // average
+    else if arg.contains("avg") {
+        if let index = arg.firstIndex(of: "a") {
+            var substr = arg[arg.startIndex..<index]
+            substr = substr.filter{!$0.isWhitespace}
+            let totalCount = substr.count
+            for c in substr {
+                if let intVal = Int(String(c)) {
+                    res += intVal
+                }
+            }
+            return res / totalCount
+        }
+    }
+    // factorial
+    else if arg.contains("fact") {
+        if arg[arg.startIndex] == "f" {
+            return 0
+        }
+        if let intVal = Int(String(arg[arg.startIndex])) {
+            if intVal == 0 {
+                return 1
+            }
+            res = 1
+            for num in 1...intVal {
+                res *= num
+            }
+            return res
+        }
+        
+    }
+    // arithmetic
+    else {
+        let filtered = arg.filter{!$0.isWhitespace}
+//        var arr : [String] = []
+//        for num in filtered {
+//            arr.append(String(num))
+//        }
+//        return calculate(arr)
+        guard
+        let left = Int(String(filtered[filtered.startIndex])),
+        let right = Int(String(filtered[filtered.index(before: filtered.endIndex)])) else {
+            return -1
+        }
+        let op = filtered[filtered.index(filtered.startIndex, offsetBy: 1)]
+        switch op {
+            case "+":
+                return right + left
+            case "-":
+                return right - left
+            case "/":
+                return right / left
+            case "*":
+                return right * left
+            case "%":
+                return right % left
+            default:
+                return -1
+        }
+    }
     return -1
 }
 
