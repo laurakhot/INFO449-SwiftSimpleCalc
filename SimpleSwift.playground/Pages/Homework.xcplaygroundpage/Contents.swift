@@ -149,7 +149,6 @@ func calculate(_ arg: String) -> Int {
         }
         
         guard
-//            let left = Int(String(filtered[..<filtered.index(filtered.startIndex, offsetBy: index)])),
             let opIndex = idx,
             let left = Int(String(filtered[..<opIndex])),
             let right = Int(String(filtered[filtered.index(after: opIndex)...])) else {
@@ -246,18 +245,99 @@ calculate("1 -2 3 -4 5 count") == 5
 
  
 
-//func calculate(_ args: [String]) -> Double {
-//    return -1.0
-//}
-//func calculate(_ arg: String) -> Double {
-//    return -1.0
-//}
-//
-//calculate(["2.0", "+", "2.0"]) == 4.0
-//calculate([".5", "+", "1.5"]) == 2.0
-//calculate(["12.0", "-", "12.0"]) == 0.0
-//calculate(["2.5", "*", "2.5"]) == 6.25
-//calculate(["2.0", "/", "2.0"]) == 1.0
-//calculate(["2.0", "%", "2.0"]) == 0.0
-//calculate("1.0 2.0 3.0 4.0 5.0 count") == 5.0
+func calculate(_ args: [String]) -> Double {
+    var res = 0.0
+    let operation = args[args.count - 1]
+    // count
+    if operation == "count" {
+        return Double(args.count - 1)
+    }
+    // average
+    else if operation == "avg" {
+        if args.count == 1 {
+            return 0.0
+        }
+        for index in 0...args.count-2 {
+            if let intVal = Double(args[index]) {
+                res += intVal
+            }
+        }
+        return res / (Double(args.count - 1))
+    }
+    // factorial
+    else if operation == "fact" {
+        if args.count == 1 {
+            return 0.0
+        }
+        if let intVal = Int(args[0]) {
+            if intVal == 0 {
+                return 1.0
+            }
+            res = 1.0
+            for num in 1...intVal {
+                res *= Double(num)
+            }
+            return res
+        }
+    }
+    // arithmetic
+    else {
+        guard args.count == 3,
+        let left = Double(args[0]),
+        let right = Double(args[2]) else {
+            return -1.0
+        }
+        let op = args[1]
+        switch op {
+            case "+":
+                return left + right
+            case "-":
+                return left - right
+            case "/":
+                return left / right
+            case "*":
+                return left * right
+            case "%":
+            return left.truncatingRemainder(dividingBy: right)
+            default:
+                return -1
+        }
+    }
+    return -1.0
+}
+func calculate(_ arg: String) -> Double {
+    var res = 0
+    // count
+    if arg.contains("count") {
+        if let index = arg.firstIndex(of: "c") {
+            var substr = arg[arg.startIndex..<index]
+            substr = substr.filter{!$0.isWhitespace && $0 != "-"}
+            return Double(substr.count / 3)
+        }
+        return -1
+    }
+    // average
+    else if arg.contains("avg") {
+        if let index = arg.firstIndex(of: "a") {
+            var substr = arg[arg.startIndex..<index]
+            substr = substr.filter{!$0.isWhitespace}
+            let totalCount = substr.count
+            for c in substr {
+                if let intVal = Int(String(c)) {
+                    res += intVal
+                }
+            }
+            return Double(res / totalCount)
+        }
+    }
+    return -1.0
+}
+
+calculate(["2.0", "+", "2.0"]) == 4.0
+calculate([".5", "+", "1.5"]) == 2.0
+calculate(["12.0", "-", "12.0"]) == 0.0
+calculate(["2.5", "*", "2.5"]) == 6.25
+calculate(["2.0", "/", "2.0"]) == 1.0
+calculate(["2.0", "%", "2.0"]) == 0.0
+calculate("1.0 2.0 3.0 4.0 5.0 count") == 5.0
 
