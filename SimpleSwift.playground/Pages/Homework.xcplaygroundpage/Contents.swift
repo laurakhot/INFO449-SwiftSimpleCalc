@@ -71,15 +71,15 @@ func calculate(_ args: [String]) -> Int {
         let op = args[1]
         switch op {
             case "+":
-                return right + left
+                return left + right
             case "-":
-                return right - left
+                return left - right
             case "/":
-                return right / left
+                return left / right
             case "*":
-                return right * left
+                return left * right
             case "%":
-                return right % left
+                return left % right
             default:
                 return -1
         }
@@ -92,8 +92,9 @@ func calculate(_ arg: String) -> Int {
     // count
     if arg.contains("count") {
         if let index = arg.firstIndex(of: "c") {
-            let substr = arg[arg.startIndex..<index]
-            return (substr.count) / 2
+            var substr = arg[arg.startIndex..<index]
+            substr = substr.filter{!$0.isWhitespace && $0 != "-"}
+            return substr.count
         }
         return -1
     }
@@ -130,29 +131,42 @@ func calculate(_ arg: String) -> Int {
     }
     // arithmetic
     else {
+        let ops = ["+", "-", "/", "*", "%"]
         let filtered = arg.filter{!$0.isWhitespace}
 //        var arr : [String] = []
 //        for num in filtered {
 //            arr.append(String(num))
 //        }
 //        return calculate(arr)
-        guard
-        let left = Int(String(filtered[filtered.startIndex])),
-        let right = Int(String(filtered[filtered.index(before: filtered.endIndex)])) else {
-            return -1
+        var idx : String.Index? = nil;
+        for val in filtered.dropFirst() {
+            if ops.contains(String(val)) {
+                if let i = filtered.firstIndex(of: val) {
+                    idx = i
+                }
+                break
+            }
         }
-        let op = filtered[filtered.index(filtered.startIndex, offsetBy: 1)]
+        
+        guard
+//            let left = Int(String(filtered[..<filtered.index(filtered.startIndex, offsetBy: index)])),
+            let opIndex = idx,
+            let left = Int(String(filtered[..<opIndex])),
+            let right = Int(String(filtered[filtered.index(after: opIndex)...])) else {
+                return -1
+        }
+        let op = filtered[opIndex]
         switch op {
             case "+":
-                return right + left
+                return left + right
             case "-":
-                return right - left
+                return left - right
             case "/":
-                return right / left
+                return left / right
             case "*":
-                return right * left
+                return left * right
             case "%":
-                return right % left
+                return left % right
             default:
                 return -1
         }
@@ -211,10 +225,12 @@ calculate("5 fact") == 120
 //: Implement `calculate([String])` and `calculate(String)` to handle negative numbers. You need only make the tests below pass. (You do not need to worry about "fact"/factorial with negative numbers, for example.)
 //:
 //: This is worth 1 pt
-/*
-calculate(["2", "+", "-2"]) == 0
+calculate(["2", "+", "-2"]) == -0
 calculate(["2", "-", "-2"]) == 4
 calculate(["2", "*", "-2"]) == -4
+calculate(["2", "/", "-2"]) == -1
+calculate(["2", "/", "-2"]) == -1
+calculate(["-5", "%", "2"]) == -1
 calculate(["2", "/", "-2"]) == -1
 calculate(["-5", "%", "2"]) == -1
 
@@ -226,31 +242,22 @@ calculate("2 - -2") == 4
 calculate("-2 / 2") == -1
 
 calculate("1 -2 3 -4 5 count") == 5
-*/
- 
-//: Implement `calculate([String])` and `calculate(String)` to use 
-//: and return floating-point values. You need only make the tests 
-//: below pass. (Factorial of floating-point numbers doesn't make 
-//: much sense, either.)
-//:
-//: Swift *will* allow you to overload based on return types, so 
-//: the below functions can co-exist simultaneously with the 
-//: Integer-based versions above.
-//: 
-//: This is worth 1 pt
-/*
-func calculate(_ args: [String]) -> Double {
-    return -1.0
-}
-func calculate(_ arg: String) -> Double {
-    return -1.0
-}
 
-calculate(["2.0", "+", "2.0"]) == 4.0
-calculate([".5", "+", "1.5"]) == 2.0
-calculate(["12.0", "-", "12.0"]) == 0.0
-calculate(["2.5", "*", "2.5"]) == 6.25
-calculate(["2.0", "/", "2.0"]) == 1.0
-calculate(["2.0", "%", "2.0"]) == 0.0
-calculate("1.0 2.0 3.0 4.0 5.0 count") == 5.0
-*/
+
+ 
+
+//func calculate(_ args: [String]) -> Double {
+//    return -1.0
+//}
+//func calculate(_ arg: String) -> Double {
+//    return -1.0
+//}
+//
+//calculate(["2.0", "+", "2.0"]) == 4.0
+//calculate([".5", "+", "1.5"]) == 2.0
+//calculate(["12.0", "-", "12.0"]) == 0.0
+//calculate(["2.5", "*", "2.5"]) == 6.25
+//calculate(["2.0", "/", "2.0"]) == 1.0
+//calculate(["2.0", "%", "2.0"]) == 0.0
+//calculate("1.0 2.0 3.0 4.0 5.0 count") == 5.0
+
